@@ -48,11 +48,11 @@ CalcLPI(Species, ID, Year, Popvalue, InitialYear, FinalYear, DatasetName,
 
 \item{OFFSET_ALL}{1 = # Add offset to all values in all time-series, to avoid log(0). Default=0}
 
-\item{LINEAR_MODEL_SHORT_FLAG}{# if=TRUE models short time-series with linear model}
+\item{OFFSET_NONE}{= FALSE Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)}
 
-\item{OFFSET_NONE=FALSE}{# Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)}
+\item{OFFSET_DIFF}{= FALSE Offset time-series with 0 values adding 1\% of mean if max value in time-series<1 and 1 if max>=1}
 
-\item{OFFSET_DIFF=FALSE}{# Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1}
+\item{LINEAR_MODEL_SHORT_FLAG}{if=TRUE models short time-series with linear model}
 }
 \value{
 Returns the species lambda array for the input species
