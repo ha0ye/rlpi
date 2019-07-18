@@ -39,9 +39,9 @@
 #' @param LAMBDA_MAX Minimum lambda to include in calculations. Default=-1
 #' @param ZERO_REPLACE_FLAG  0 = +minimum value; 1 = +1\% of mean value; 2 = +1. Default=1
 #' @param OFFSET_ALL 1 = Add offset to all values, to avoid log(0). Default=0
-#' @param OFFSET_NONE
-#' @param OFFSET_DIFF
-#' @param LINEAR_MODEL_SHORT_FLAG
+#' @param OFFSET_NONE=FALSE # Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)
+#' @param OFFSET_DIFF=FALSE # Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1
+#' @param LINEAR_MODEL_SHORT_FLAG # if=TRUE models short time-series with linear model
 #' @param VERBOSE Whether to print verbose information. Default=1
 #' @return lpi - A data frame containing an LPI and CIs if calculated
 #' @examples
