@@ -13,14 +13,14 @@ smooth_lpi <- function(d, N, smooth_type="loess") {
 
   if (smooth_type=="loess") {
     x_range <- 1:length(d$LPI_final)
-    y.loess <- loess(d$LPI_final~x_range, span=0.25)
-    smooth$LPI_final <- predict(y.loess, data.frame(x_range))
+    y.loess <- stats::loess(d$LPI_final~x_range, span=0.25)
+    smooth$LPI_final <- stats::predict(y.loess, data.frame(x_range))
 
-    y.loess <- loess(smooth$CI_low~x_range, span=0.25)
-    smooth$CI_low <- predict(y.loess, data.frame(x_range))
+    y.loess <- stats::loess(smooth$CI_low~x_range, span=0.25)
+    smooth$CI_low <- stats::predict(y.loess, data.frame(x_range))
 
-    y.loess <- loess(smooth$CI_high~x_range, span=0.25)
-    smooth$CI_high <- predict(y.loess, data.frame(x_range))
+    y.loess <- stats::loess(smooth$CI_high~x_range, span=0.25)
+    smooth$CI_high <- stats::predict(y.loess, data.frame(x_range))
 
   } else {
     # Boxcar with end-points pinned

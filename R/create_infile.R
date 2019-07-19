@@ -26,7 +26,7 @@ convert_to_rows <- function(in_data, start_col_name="X1950", end_col_name="X2017
 
   # print(pop_data)
 
-  m_pop_data <- reshape2:::melt.data.frame(pop_data, id=c("Binomial", "ID"), variable.name = "year", value.name="popvalue")
+  m_pop_data <- reshape2:::melt(pop_data, id=c("Binomial", "ID"), variable.name = "year", value.name="popvalue")
   #colnames(m_pop_data) <- c("Binomial", "ID", "year", "popvalue")
 
   #print(dimnames(pop_data))
@@ -56,9 +56,9 @@ create_infile <- function(pop_data_source, index_vector=TRUE, name="default_infi
   non_null_all_data = all_data[!is.na(all_data$pop), ]
   clean_data = non_null_all_data[non_null_all_data$year >= CUT_OFF_YEAR, ]
   filename <- paste(name, "_pops.txt", sep="")
-  write.table(clean_data, filename, sep="\t", row.names=FALSE, quote = F)
+  utils::write.table(clean_data, filename, sep="\t", row.names=FALSE, quote = F)
   # Write infile
   in_file_data <- data.frame(FileName=filename, Group=1, Weighting=1)
-  write.table(in_file_data, gsub("pops.txt", "infile.txt", filename), sep="\t", row.names=FALSE)
+  utils::write.table(in_file_data, gsub("pops.txt", "infile.txt", filename), sep="\t", row.names=FALSE)
   return(paste(name, "_infile.txt", sep=""))
 }

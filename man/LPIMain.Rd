@@ -73,7 +73,7 @@ LPIMain(infile = "Infile.txt", basedir = ".", REF_YEAR = 1970,
 
 \item{OFFSET_NONE=FALSE}{# Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)}
 
-\item{OFFSET_DIFF=FALSE}{# Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1}
+\item{OFFSET_DIFF=FALSE}{# Offset time-series with 0 values adding 1\% of mean if max value in time-series<1 and 1 if max>=1}
 }
 \value{
 lpi - A data frame containing an LPI and CIs if calculated
@@ -97,18 +97,20 @@ ggplot_lpi_multi(list(lpi_global, lpi_tropical), names=c("global", "tropical"))
 
 # Get example data from package
 # Copy zipped data to local directory
+setwd(tempdir())
 file.copy(from=system.file("extdata", "example_data.zip", package = "rlpi"), to=".")
 unzip("example_data.zip")
 
 # Terrestrial LPI with equal weighting across classes and realms
 # Default gives 100 boostraps (this will take a few minutes to run (on a 2014 Macbook))
-terr_lpi <- LPIMain("terrestrial_class_realms_infile.txt")
+terr_lpi <- LPIMain("example_data/terrestrial_class_nearctic_infile.txt")
 
 # Nicer plot
 ggplot_lpi(terr_lpi)
 
 # Run same again, but used cached lambdas (force_recalculation == 0), and now weighted by class, but equal across realms (see infile for weights)
-terr_lpi_b <- LPIMain("terrestrial_class_realms_infile.txt", force_recalculation=0, use_weightings=1)
+terr_lpi_b <- LPIMain("example_data/terrestrial_class_nearctic_infile.txt",
+                      force_recalculation=0, use_weightings=1)
 
 # Putting the two LPIs together in a list
 lpis <- list(terr_lpi, terr_lpi_b)
@@ -116,9 +118,11 @@ lpis <- list(terr_lpi, terr_lpi_b)
 ggplot_multi_lpi(lpis, xlims=c(1970, 2012))
 
 # Can also plot these next to each other, and use some more meaningful titles
-ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"), xlims=c(1970, 2012), facet=TRUE)
+ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"),
+                 xlims=c(1970, 2012), facet=TRUE)
 
 # And can log the y-axis - need to set ylim as log(0) is -Inf
-ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"), xlims=c(1970, 2012), facet=TRUE, ylim=c(0.5, 2), trans="log")
+ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"),
+                 xlims=c(1970, 2012), facet=TRUE, ylim=c(0.5, 2), trans="log")
 
 }

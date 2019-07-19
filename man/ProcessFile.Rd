@@ -39,7 +39,7 @@ ProcessFile(DatasetName, ref_year, MODEL_SELECTION_FLAG, GAM_GLOBAL_FLAG,
 
 \item{OFFSET_NONE=FALSE}{# Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)}
 
-\item{OFFSET_DIFF=FALSE}{# Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1}
+\item{OFFSET_DIFF=FALSE}{# Offset time-series with 0 values adding 1\% of mean if max value in time-series<1 and 1 if max>=1}
 }
 \value{
 Return length of lamda array (number of lamda values?) - results are saved to file

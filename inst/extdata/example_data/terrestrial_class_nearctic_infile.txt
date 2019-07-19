@@ -1,4 +1,0 @@
-"FileName"	"Group"	"Weighting"
-"terrestrial_Nearctic_Aves_pops.txt"	1	0.376366476
-"terrestrial_Nearctic_nm_pops.txt"	1	0.249869859
-"terrestrial_Nearctic_Herps_pops.txt"	1	0.373763665

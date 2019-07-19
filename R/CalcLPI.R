@@ -71,7 +71,7 @@ CalcLPI <- function(Species,
   SpeciesLambda = matrix(0, noSpecies, FinalYear - InitialYear + 1)
 
   if (show_progress){
-    prog <- txtProgressBar(min=0, max=noSpecies, char="*", style=3)
+    prog <- utils::txtProgressBar(min=0, max=noSpecies, char="*", style=3)
   }
 # Here a file is created that includes the list of populations processed by chain
   MethodFlagLoop = 0
@@ -215,13 +215,13 @@ CalcLPI <- function(Species,
               model <- mgcv::gam(PopNLog ~ s(YearPop, k = SmoothParm), fx = TRUE)
               # check if the model is ok
               if (AUTO_DIAGNOSTIC_FLAG == 1) {
-                rsd <- residuals(model)
+                rsd <- stats::residuals(model)
                 s <- mgcv::`s`
                 modelres <- mgcv::gam(rsd ~ s(YearPop, k = length(PopN), bs = "cs"),
                                 gamma = 1.4)
                 if ((abs(sum(modelres$edf) - 1)) < 0.01) {
                   # 0.01
-                  PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+                  PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
                   PopNInt = exp(PopNInt)
                   Flag = 1
                   PopProcessedGAMCounter = PopProcessedGAMCounter + 1
@@ -230,7 +230,7 @@ CalcLPI <- function(Species,
               } else {
                 summary(model)
                 readline(prompt = "Press any key to continue")
-                plot(model, pages = 1, residuals = TRUE, all.terms = TRUE, shade = TRUE,
+                grDevices::plot(model, pages = 1, residuals = TRUE, all.terms = TRUE, shade = TRUE,
                      shade.col = 2)
                 readline(prompt = "Press any key to continue")
                 mgcv::gam.check(model)
@@ -239,7 +239,7 @@ CalcLPI <- function(Species,
                   Char = readline(prompt = "Press 'Y' to accept model, 'N' to reject GAM model and use default method")
                 }
                 if (Char == "Y") {
-                  PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+                  PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
                   PopNInt = exp(PopNInt)
                   Flag = 1
                   PopProcessedGAMCounter = PopProcessedGAMCounter + 1
@@ -254,12 +254,12 @@ CalcLPI <- function(Species,
                 while ((length(PopN) >= SmoothParm) & (Flag == 0)) {
                   s <- mgcv::`s`
                   model <- mgcv::gam(PopNLog ~ s(YearPop, k = SmoothParm), fx = TRUE)
-                  rsd <- residuals(model)
+                  rsd <- stats::residuals(model)
                   modelres <- mgcv::gam(rsd ~ s(YearPop, k = length(PopN), bs = "cs"),
                                   gamma = 1.4)
                   if ((abs(sum(modelres$edf) - 1)) < 0.01) {
                     Flag = 1
-                    PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+                    PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
                     PopNInt = exp(PopNInt)
                     PopProcessedGAMCounter = PopProcessedGAMCounter + 1
                     PopProcessedGAM[PopProcessedGAMCounter] = PopID[J]
@@ -273,7 +273,7 @@ CalcLPI <- function(Species,
                   model <- mgcv::gam(PopNLog ~ s(YearPop, k = SmoothParm), fx = TRUE)
                   summary(model)
                   readline(prompt = "Press any key to continue")
-                  plot(model, pages = 1, residuals = TRUE, all.terms = TRUE,
+                  graphics::plot(model, pages = 1, residuals = TRUE, all.terms = TRUE,
                        shade = TRUE, shade.col = 2)
                   readline(prompt = "Press any key to continue")
                   mgcv::gam.check(model)
@@ -282,7 +282,7 @@ CalcLPI <- function(Species,
                     Char = readline(prompt = "Press 'Y' to accept model, 'N' to reject model")
                   }
                   if (Char == "Y") {
-                    PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+                    PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
                     PopNInt = exp(PopNInt)
                     Flag = 1
                     PopProcessedGAMCounter = PopProcessedGAMCounter + 1
@@ -304,7 +304,7 @@ CalcLPI <- function(Species,
             SmoothParm = length(PopN)
             s <- mgcv::`s`
             model <- mgcv::gam(PopNLog ~ s(YearPop, k = SmoothParm), fx = TRUE)
-            PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+            PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
             PopNInt = exp(PopNInt)
             PopProcessedGAMCounter = PopProcessedGAMCounter + 1
             PopProcessedGAM[PopProcessedGAMCounter] = PopID[J]
@@ -312,11 +312,11 @@ CalcLPI <- function(Species,
             if (LINEAR_MODEL_SHORT_FLAG == TRUE) {
               MethodFlagLoop = MethodFlagLoop + 1
               MethodFlag[MethodFlagLoop] = PopID[J]
-              model <- lm(PopNLog ~ YearPop)
+              model <- stats::lm(PopNLog ~ YearPop)
               # r2 <- summary(model)$r.squared
               # LM_R2_THRESH = 0.0
               # if (r2 > LM_R2_THRESH) {
-                PopNInt <- predict(model, data.frame(YearPop = YearPopInt))
+                PopNInt <- stats::predict(model, data.frame(YearPop = YearPopInt))
                 PopNInt = exp(PopNInt)
               # } else {
                 # PopNotProcessedCounter = PopNotProcessedCounter + 1
@@ -410,7 +410,7 @@ CalcLPI <- function(Species,
     pop_lambda_filename <- file.path(basedir, gsub(".txt", "_PopLambda.txt", DatasetName))
     #Pop_Headers<-t(c("population_id", as.vector(InitialYear:FinalYear)))
     #write.table(Pop_Headers,file=pop_lambda_filename, sep=",", eol="\n", quote=FALSE, col.names=FALSE, row.names = FALSE)
-    write.table(PopData,sep=",", eol="\n", file=pop_lambda_filename, quote=FALSE, col.names=FALSE, row.names = FALSE, append=TRUE)
+    utils::write.table(PopData,sep=",", eol="\n", file=pop_lambda_filename, quote=FALSE, col.names=FALSE, row.names = FALSE, append=TRUE)
 
 
     # Save the species average lambda values
@@ -466,23 +466,23 @@ CalcLPI <- function(Species,
     sIDArray[sNamesCounter] = ID[I, 1]
 
     # cat('Results saved\n')
-    if (show_progress) setTxtProgressBar(prog, I)
+    if (show_progress) utils::setTxtProgressBar(prog, I)
   }
   if (show_progress) close(prog)
   cat("\n")
 
   PopNotProcessed1 = PopNotProcessed[1, 1:PopNotProcessedCounter]
-  write.table(PopNotProcessed1, file = file.path(basedir, "lpi_temp", "PopNotProcessed.txt"))  # insert your desired file name here
+  utils::write.table(PopNotProcessed1, file = file.path(basedir, "lpi_temp", "PopNotProcessed.txt"))  # insert your desired file name here
   MethodFlag1 = MethodFlag[1, 1:MethodFlagLoop]
   if (LINEAR_MODEL_SHORT_FLAG == 1) {
-    write.table(MethodFlag1, file=file.path(basedir, "lpi_temp", "PopProcessed_LM.txt"))  # insert your desired file name here
+    utils::write.table(MethodFlag1, file=file.path(basedir, "lpi_temp", "PopProcessed_LM.txt"))  # insert your desired file name here
   } else {
-    write.table(MethodFlag1, file=file.path(basedir, "lpi_temp", "PopProcessed_Chain.txt"))  # insert your desired file name here
+    utils::write.table(MethodFlag1, file=file.path(basedir, "lpi_temp", "PopProcessed_Chain.txt"))  # insert your desired file name here
   }
   PopProcessedGAM1 = PopProcessedGAM[1, 1:PopProcessedGAMCounter]
-  write.table(PopProcessedGAM1, file = file.path(basedir, "lpi_temp", "PopProcessedGAM.txt")) # insert your desired file name here
+  utils::write.table(PopProcessedGAM1, file = file.path(basedir, "lpi_temp", "PopProcessedGAM.txt")) # insert your desired file name here
   sNamesArray1 = sNamesArray[1:sNamesCounter, 1]
-  write.table(sNamesArray1, file = file.path(basedir, "lpi_temp", "SpeciesName.txt"), quote = FALSE)
+  utils::write.table(sNamesArray1, file = file.path(basedir, "lpi_temp", "SpeciesName.txt"), quote = FALSE)
 
   Headers<-t(c("Species", as.vector(InitialYear:FinalYear)))
 
@@ -492,8 +492,8 @@ CalcLPI <- function(Species,
   #SpeciesData<-cbind(sIDArray, as.vector(sNamesT), SpeciesLambda)
   SpeciesData<-cbind(as.vector(sNamesArray), SpeciesLambda)
   lambda_filename <- file.path(basedir, gsub(".txt", "_Lambda.txt", DatasetName))
-  write.table(Headers,file=lambda_filename, sep=",", eol="\n", quote=FALSE, col.names=FALSE, row.names = FALSE)
-  write.table(SpeciesData,sep=",", eol="\n", file=lambda_filename, quote=FALSE, col.names=FALSE, row.names = FALSE, append=TRUE)
+  utils::write.table(Headers,file=lambda_filename, sep=",", eol="\n", quote=FALSE, col.names=FALSE, row.names = FALSE)
+  utils::write.table(SpeciesData,sep=",", eol="\n", file=lambda_filename, quote=FALSE, col.names=FALSE, row.names = FALSE, append=TRUE)
 
   #sp_df = melt(SpeciesData)
 

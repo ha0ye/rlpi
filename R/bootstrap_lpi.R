@@ -41,7 +41,7 @@ bootstrap_lpi <- function(SpeciesLambdaArray, fileindex, DSize, Group, Weighting
 
       if(!is.null(SpeciesLambda)) {
         # We shouldn't be sampling missing values....
-        SpeciesLambdaVal = na.omit(SpeciesLambda)
+        SpeciesLambdaVal = stats::na.omit(SpeciesLambda)
 
         # Create sample with replacement (single bootstrap instance)
         BootVal <- sample(SpeciesLambdaVal, replace = T)

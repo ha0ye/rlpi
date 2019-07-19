@@ -13,7 +13,7 @@
 #' @param ZERO_REPLACE_FLAG  0 = +minimum value; 1 = +1\% of mean value; 2 = +1. Default=1
 #' @param OFFSET_ALL 1 = Add offset to all values, to avoid log(0). Default=0
 #' @param OFFSET_NONE=FALSE # Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)
-#' @param OFFSET_DIFF=FALSE # Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1
+#' @param OFFSET_DIFF=FALSE # Offset time-series with 0 values adding 1\% of mean if max value in time-series<1 and 1 if max>=1
 #' @param LINEAR_MODEL_SHORT_FLAG # if=TRUE models short time-series with linear model
 #' @return Return length of lamda array (number of lamda values?) - results are saved to file
 #' @export
@@ -39,7 +39,7 @@ ProcessFile <-function(DatasetName,
 
   md5val <- tools::md5sum(DatasetName)
   # Read data file
-  Data = read.table(DatasetName, header = TRUE)
+  Data = utils::read.table(DatasetName, header = TRUE)
 
   # Get data from file as column vectors
   SpeciesSSet = Data[1]
@@ -67,7 +67,7 @@ ProcessFile <-function(DatasetName,
 
   pop_lambda_filename <- file.path(basedir, gsub(".txt", "_PopLambda.txt", DatasetName))
   Pop_Headers<-t(c("population_id", as.vector(InitialYear:FinalYear)))
-  write.table(Pop_Headers,file=pop_lambda_filename, sep=",", eol="\n", quote=FALSE, col.names=FALSE, row.names = FALSE)
+  utils::write.table(Pop_Headers,file=pop_lambda_filename, sep=",", eol="\n", quote=FALSE, col.names=FALSE, row.names = FALSE)
 
   SpeciesLambda = CalcLPI(Species=SpeciesSSet,
                           ID=IDSSet,
@@ -104,7 +104,7 @@ ProcessFile <-function(DatasetName,
 
   DataFileName = file.path(basedir, "lpi_temp", paste0(md5val, "_splambda.csv"))
   cat(sprintf("Saving species lambda to file: %s\n", DataFileName))
-  write.table(SpeciesLambda, DataFileName, sep = ",", col.names = FALSE, row.names = FALSE)
+  utils::write.table(SpeciesLambda, DataFileName, sep = ",", col.names = FALSE, row.names = FALSE)
 
   # Adding count of pops per species:
   # *****
@@ -117,7 +117,7 @@ ProcessFile <-function(DatasetName,
   sorted_lambdas_count = cbind(sp.count, sorted_lambdas)
 
   cat(sprintf("Saving species lambda to file: %s\n", DataFileName))
-  write.table(sorted_lambdas_count, DataFileName, sep = ",", col.names=NA)
+  utils::write.table(sorted_lambdas_count, DataFileName, sep = ",", col.names=NA)
 
   #rm(SpeciesSSet, IDSSet, YearSSet, PopvalueSSet)
 
@@ -158,12 +158,12 @@ ProcessFile <-function(DatasetName,
 
   colnames(DTemp) <- InitialYear:FinalYear
 
-  write.table(DTemp, DataFileName, sep = ",", row.names = FALSE)
+  utils::write.table(DTemp, DataFileName, sep = ",", row.names = FALSE)
 
   DataFileName = file.path(basedir, gsub(".txt", "_dtemp.csv", DatasetName))
   cat("Saving DTemp to file: ", DataFileName, "\n")
   #write.table(DTemp, DataFileName, sep = ",", col.names = FALSE, row.names = FALSE)
-  write.table(DTemp, DataFileName, sep = ",", row.names = FALSE)
+  utils::write.table(DTemp, DataFileName, sep = ",", row.names = FALSE)
 
   # Return length of lamda array (number of lamda values?)
   #cat("Returning length of lambda\n")

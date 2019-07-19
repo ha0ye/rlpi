@@ -40,7 +40,7 @@
 #' @param ZERO_REPLACE_FLAG  0 = +minimum value; 1 = +1\% of mean value; 2 = +1. Default=1
 #' @param OFFSET_ALL 1 = Add offset to all values, to avoid log(0). Default=0
 #' @param OFFSET_NONE=FALSE # Does nothing (leaves 0 unaffected **used for testing will break if there are 0 values in the source data **)
-#' @param OFFSET_DIFF=FALSE # Offset time-series with 0 values adding 1% of mean if max value in time-series<1 and 1 if max>=1
+#' @param OFFSET_DIFF=FALSE # Offset time-series with 0 values adding 1\% of mean if max value in time-series<1 and 1 if max>=1
 #' @param LINEAR_MODEL_SHORT_FLAG # if=TRUE models short time-series with linear model
 #' @param VERBOSE Whether to print verbose information. Default=1
 #' @return lpi - A data frame containing an LPI and CIs if calculated
@@ -48,18 +48,20 @@
 #'
 #' # Get example data from package
 #' # Copy zipped data to local directory
+#' setwd(tempdir())
 #' file.copy(from=system.file("extdata", "example_data.zip", package = "rlpi"), to=".")
 #' unzip("example_data.zip")
 #'
 #' # Terrestrial LPI with equal weighting across classes and realms
 #' # Default gives 100 boostraps (this will take a few minutes to run (on a 2014 Macbook))
-#' terr_lpi <- LPIMain("terrestrial_class_realms_infile.txt")
+#' terr_lpi <- LPIMain("example_data/terrestrial_class_nearctic_infile.txt")
 #'
 #' # Nicer plot
 #' ggplot_lpi(terr_lpi)
 #'
 #' # Run same again, but used cached lambdas (force_recalculation == 0), and now weighted by class, but equal across realms (see infile for weights)
-#' terr_lpi_b <- LPIMain("terrestrial_class_realms_infile.txt", force_recalculation=0, use_weightings=1)
+#' terr_lpi_b <- LPIMain("example_data/terrestrial_class_nearctic_infile.txt",
+#'                       force_recalculation=0, use_weightings=1)
 #'
 #' # Putting the two LPIs together in a list
 #' lpis <- list(terr_lpi, terr_lpi_b)
@@ -67,10 +69,12 @@
 #' ggplot_multi_lpi(lpis, xlims=c(1970, 2012))
 #'
 #' # Can also plot these next to each other, and use some more meaningful titles
-#' ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"), xlims=c(1970, 2012), facet=TRUE)
+#' ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"),
+#'                  xlims=c(1970, 2012), facet=TRUE)
 #'
 #' # And can log the y-axis - need to set ylim as log(0) is -Inf
-#' ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"), xlims=c(1970, 2012), facet=TRUE, ylim=c(0.5, 2), trans="log")
+#' ggplot_multi_lpi(lpis, names=c("Weighted", "Unweighted"),
+#'                  xlims=c(1970, 2012), facet=TRUE, ylim=c(0.5, 2), trans="log")
 #'
 #' @export
 #'
@@ -126,7 +130,7 @@ LPIMain <- function(infile="Infile.txt",
     }
 
     # RF: Get list of input files
-    FileTable = read.table(infile, header = TRUE)
+    FileTable = utils::read.table(infile, header = TRUE)
     # RF: Get names from file
     FileNames = FileTable$FileName
     # Get groups from file as column vector
@@ -252,10 +256,10 @@ LPIMain <- function(infile="Infile.txt",
       # Read SpeciesLambda and DTemp from saved files
 
       FileName = file.path(basedir, "lpi_temp", paste0(md5val, "_splambda.csv"))
-      SpeciesLambda = read.table(FileName, header = FALSE, sep = ",")
+      SpeciesLambda = utils::read.table(FileName, header = FALSE, sep = ",")
       debug_print(VERBOSE, sprintf("Loading previously analysed species lambda file for '%s' from MD5 hash: %s\n", as.character(FileNames[FileNo]), FileName))
 
-      species_names = read.table(file.path(basedir, "lpi_temp/SpeciesName.txt"))
+      species_names = utils::read.table(file.path(basedir, "lpi_temp/SpeciesName.txt"))
 
       cat(sprintf("%s, Number of species: %s\n", as.character(FileNames[FileNo]), dim(SpeciesLambda)[1]))
 
@@ -271,7 +275,7 @@ LPIMain <- function(infile="Infile.txt",
       FileName = file.path(basedir, "lpi_temp", paste0(md5val, "_dtemp.csv"))
       debug_print(VERBOSE, sprintf("Loading previously analysed dtemp file from MD5 hash: %s\n", FileName))
       #DTemp = read.table(FileName, header = F, sep = ",", col.names = FALSE)
-      DTemp = read.table(FileName, header = T, sep = ",")
+      DTemp = utils::read.table(FileName, header = T, sep = ",")
 
       #print(DTemp)
       #DTemp = as.numeric(DTemp)
@@ -286,7 +290,7 @@ LPIMain <- function(infile="Infile.txt",
     #write.table(DTempArray, file="dtemp_array.txt")
     f_name = file = file.path(basedir, gsub(".txt", "_dtemp_array.txt", infile))
     cat("Saving DTemp Array to file: ", f_name, "\n")
-    write.table(DTempArray, f_name)
+    utils::write.table(DTempArray, f_name)
 
     dtemp_df <- data.frame(filenames=FileNames, dtemps=DTempArray)
     colnames(dtemp_df) <- c("filename", seq(REF_YEAR, REF_YEAR + DSize - 1))
@@ -298,7 +302,7 @@ LPIMain <- function(infile="Infile.txt",
 
       width=20
       height=8
-      pdf(file.path(basedir, gsub(".txt", "_dtemp_array_plot.pdf", infile)), width = width, height = height)
+      grDevices::pdf(file.path(basedir, gsub(".txt", "_dtemp_array_plot.pdf", infile)), width = width, height = height)
       df.m <- reshape2::melt(dtemp_df, id.vars = "filename")
       df.m$value[df.m$value == -99] = NA
       p_line <- ggplot2::ggplot(df.m, ggplot2::aes(variable, value, group=filename, col=filename)) +
@@ -308,12 +312,12 @@ LPIMain <- function(infile="Infile.txt",
               legend.position = "bottom") + ggplot2::guides(col = ggplot2::guide_legend(nrow=6))
 
       print(p_line)
-      dev.off()
+      grDevices::dev.off()
     }
 
     f_name = file = file.path(basedir, gsub(".txt", "_dtemp_array_named.csv", infile))
     cat("Saving DTemp Array with filesnames to file: ", f_name, "\n")
-    write.csv(dtemp_df, f_name, row.names = FALSE)
+    utils::write.csv(dtemp_df, f_name, row.names = FALSE)
 
     t1 <- proc.time() - ptm
     cat(sprintf("[Calculating LPI...] System: %f, User: %f, Elapsed: %f\n", t1[1], t1[2], t1[3]))
@@ -397,8 +401,8 @@ LPIMain <- function(infile="Infile.txt",
               # Index = which(BootIFlag != 1)
               # BootIVal = BootI[Index, J]
 
-              CIx[J, 1] = quantile(BootIVal, 0.025, names = FALSE)
-              CIx[J, 2] = quantile(BootIVal, 0.975, names = FALSE)
+              CIx[J, 1] = stats::quantile(BootIVal, 0.025, names = FALSE)
+              CIx[J, 2] = stats::quantile(BootIVal, 0.975, names = FALSE)
             } else {
               # If we don't have an index for this year, we shouldn't have
               CIx[J, 1] = NA
@@ -452,7 +456,7 @@ LPIMain <- function(infile="Infile.txt",
       #leverage_results_table$total <- rowSums(leverage_results_table)
 
       leverage_results_table$id <- unlist(leverage_species)
-      write.csv(leverage_results_table, file=file.path(basedir, "species_leverage_lpi_results.csv"))
+      utils::write.csv(leverage_results_table, file=file.path(basedir, "species_leverage_lpi_results.csv"))
 
       leverage_diff_table <- data.frame(leverage_diff)
       colnames(leverage_diff_table) <- seq(REF_YEAR, REF_YEAR + DSize - 1)
@@ -460,7 +464,7 @@ LPIMain <- function(infile="Infile.txt",
       leverage_diff_table$total <- rowSums(leverage_diff_table)
 
       leverage_diff_table$id <- unlist(leverage_species)
-      write.csv(leverage_diff_table, file=file.path(basedir, "species_leverage_diff_lambdas_results.csv"))
+      utils::write.csv(leverage_diff_table, file=file.path(basedir, "species_leverage_diff_lambdas_results.csv"))
     }
 
     if (SWITCH_PT_FLAG == 1) {
@@ -468,7 +472,7 @@ LPIMain <- function(infile="Infile.txt",
         t1 <- proc.time() - ptm
         cat(sprintf("[Calculating Switch Points...] System: %f, User: %f, Elapsed: %f\n", t1[1], t1[2], t1[3]))
 
-        sp_prog <- txtProgressBar(min=0, max=BOOT_STRAP_SIZE, char="*", style=3)
+        sp_prog <- utils::txtProgressBar(min=0, max=BOOT_STRAP_SIZE, char="*", style=3)
 
         # Calculate the switching points
         SecondDerivBoot = matrix(0, BOOT_STRAP_SIZE, DSize)
@@ -523,7 +527,7 @@ LPIMain <- function(infile="Infile.txt",
             SecDeriv = CalcSDev(I, h, d, interval)
             SecondDerivBoot[Loop, ] = SecDeriv
 
-            setTxtProgressBar(sp_prog, Loop)
+            utils::setTxtProgressBar(sp_prog, Loop)
         }
 
         close(sp_prog)
@@ -536,8 +540,8 @@ LPIMain <- function(infile="Infile.txt",
             SecondDerivBootVal = SecondDerivBoot[, J]
             Index = which(SecondDerivBootVal != -1)
             SecondDerivBootVal = SecondDerivBoot[Index, J]
-            CI[J, 1] = quantile(SecondDerivBootVal, 0.025, names = FALSE)
-            CI[J, 2] = quantile(SecondDerivBootVal, 0.975, names = FALSE)
+            CI[J, 1] = stats::quantile(SecondDerivBootVal, 0.025, names = FALSE)
+            CI[J, 2] = stats::quantile(SecondDerivBootVal, 0.975, names = FALSE)
         }
 
         SwitchingPt = matrix(0, 1, DSize)
@@ -592,13 +596,13 @@ LPIMain <- function(infile="Infile.txt",
 
     f_name = file = file.path(basedir, gsub(".txt", "_Results.txt", infile))
     cat("Saving final output to file: ", f_name, "\n")
-    write.table(LPIdata, f_name)
+    utils::write.table(LPIdata, f_name)
 
     #cat("[Min/Max] Create min/max file\n")
     # create minmax file
 
     # RF: Get list of input files
-    FileTable = read.table(infile, header = TRUE)
+    FileTable = utils::read.table(infile, header = TRUE)
     # RF: Get names from file
     FileNames = FileTable$FileName
     # Get groups from file as column vector
@@ -612,7 +616,7 @@ LPIMain <- function(infile="Infile.txt",
     for (FileNo in 1:NoFiles) {
       Dataset <- toString(FileNames[FileNo])
       #cat(Dataset, "\n")
-      Data <- read.table(Dataset, header = TRUE)
+      Data <- utils::read.table(Dataset, header = TRUE)
       colnames(Data) <- c("Binomial", "ID", "year", "popvalue")
 
       # bit of a hack to avoid R CMD CHECK, sets variable 'year' used in ddply to be NULL
@@ -623,7 +627,7 @@ LPIMain <- function(infile="Infile.txt",
       #my.out <- do.call("rbind", minmax)
       f_name = file = file.path(basedir, gsub(".txt", "_Minmax.txt", Dataset))
       cat("Saving Min/Max file to: ", f_name, "\n")
-      write.table(minmax, sep=",", eol="\n", f_name,
+      utils::write.table(minmax, sep=",", eol="\n", f_name,
                   quote = FALSE, append = FALSE, row.names = F, col.names=T)
     }
 
@@ -637,8 +641,8 @@ LPIMain <- function(infile="Infile.txt",
     if (save_plots) {
       output_file <- file.path(basedir, gsub(".txt", ".pdf", infile))
       cat("Saving Plot to PDF: ", output_file, "\n")
-      dev.copy(pdf, output_file)
-      dev.off()
+      grDevices::dev.copy(pdf, output_file)
+      grDevices::dev.off()
       #savePlot()
     }
     t1 <- proc.time() - ptm

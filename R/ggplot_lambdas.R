@@ -19,9 +19,8 @@ ggplot_lambdas <- function(lambda_values, col="red", line_col="blue", title="",
                            ylims=c(0.9, 1.1), ybreaks=0.05,
                            xlims=c(1970, 2014.5), trans="identity",
                            yrbreaks = 5) {
-  require(ggplot2)
 
-  pd <- position_dodge(0.1)
+  pd <- ggplot2::position_dodge(0.1)
 
   # Calculate means for each year
   mean_lambdas <- colMeans(lambda_values, na.rm = T)
@@ -29,7 +28,7 @@ ggplot_lambdas <- function(lambda_values, col="red", line_col="blue", title="",
 
   ## Calculate SEM
   # SEM function
-  se <- function(x) sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))
+  se <- function(x) sqrt(stats::var(x,na.rm=TRUE)/length(stats::na.omit(x)))
   # Applied to columns
   #sem_lambdas <- apply(lambda_values[, 2:46],2, se)
   sem_lambdas <- apply(lambda_values,2, se)
@@ -61,20 +60,20 @@ ggplot_lambdas <- function(lambda_values, col="red", line_col="blue", title="",
 
 
   # Plot points for means, bars for limits, line along baseline
-  plot <- ggplot(mean_limits, aes(x=years, y=mean_lambdas)) +
-    geom_hline(yintercept = baseline, col=baseline_color) +
-    geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), colour=line_col, width=.3) +
-    geom_point(size=2, shape=21, fill=col, col=col) +
-    coord_cartesian(ylim=ylims, xlim=xlims) +
-    xlab("Years") +
-    ylab(paste("Lambda values (", baseline, " = stable)", sep="")) +
-    ggtitle(title) +
-    scale_x_continuous(limits = xlims, breaks = seq(xlims[1], xlims[2], yrbreaks), expand = c(0,0)) + # Set tick every 5 years
-    scale_y_continuous(limits = ylims, trans=trans, breaks = seq(ylims[1], ylims[2], ybreaks)) +
-    theme_bw() +
-    theme(legend.justification=c(1,0),
+  plot <- ggplot2::ggplot(mean_limits, ggplot2::aes(x=years, y=mean_lambdas)) +
+    ggplot2::geom_hline(yintercept = baseline, col=baseline_color) +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin=lower_limit, ymax=upper_limit), colour=line_col, width=.3) +
+    ggplot2::geom_point(size=2, shape=21, fill=col, col=col) +
+    ggplot2::coord_cartesian(ylim=ylims, xlim=xlims) +
+    ggplot2::xlab("Years") +
+    ggplot2::ylab(paste("Lambda values (", baseline, " = stable)", sep="")) +
+    ggplot2::ggtitle(title) +
+    ggplot2::scale_x_continuous(limits = xlims, breaks = seq(xlims[1], xlims[2], yrbreaks), expand = c(0,0)) + # Set tick every 5 years
+    ggplot2::scale_y_continuous(limits = ylims, trans=trans, breaks = seq(ylims[1], ylims[2], ybreaks)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.justification=c(1,0),
           legend.position=c(1,0),
-          axis.text.x = element_text(size=12, angle = 90, hjust = 1),
-          panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
+          axis.text.x = ggplot2::element_text(size=12, angle = 90, hjust = 1),
+          panel.grid.minor.x = ggplot2::element_blank(), panel.grid.minor.y = ggplot2::element_blank())
   return(plot)
 }
